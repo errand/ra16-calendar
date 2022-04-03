@@ -1,5 +1,8 @@
 # React Homeworks
 
+[![Build status](https://ci.appveyor.com/api/projects/status/nmsj88t8b6aap3yc?svg=true)](https://ci.appveyor.com/project/errand/ra16-calendar)
+
+
 ## Available Scripts
 
 In the project directory, you can run:
