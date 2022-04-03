@@ -1,79 +1,59 @@
 import PropTypes from 'prop-types';
 import moment from "moment";
 import 'moment/locale/ru';
+import CalendarHeader from './CalendarHeader'
+import CalendarWeeks from './CalendarWeeks'
 
 moment.locale('ru');
 
 function Calendar(props) {
   const {date} = props;
 
-  const today = moment(date).format('D')
-  const date2 = new Date();
-  console.log(date2.getDate())
-  const todayDayName = moment(date).format('dddd')
-  const todayMonthName = moment(date).format('MMMM')
-  const todayMonthNameSubj = moment(date).format('D MMMM').split(' ')
-  const todayYear = moment(date).format(' YYYY')
+  const value = moment();
+  const startDate = value.clone().startOf('month').startOf('week');
+  const endDate = value.clone().endOf('month').endOf('week');
+  const day = startDate.clone().subtract(1 ,'day')
+  const calendar = [];
+  while (day.isBefore(endDate, 'day')) {
+    calendar.push(
+      Array(7).fill(0).map(() => day.add(1, 'day').clone())
+    );
+  }
+
+  function isToday(day) {
+    return value.isSame(day, 'day')
+  }
+
+  function thisMonth(day) {
+    return value.isSame(day, 'month')
+  }
+
+  function styleDay(day) {
+    if(isToday(day)) return 'ui-datepicker-today'
+    if(!thisMonth(day)) return 'ui-datepicker-other-month'
+    return ''
+  }
 
   return (
     <div className="ui-datepicker">
-      <div className="ui-datepicker-material-header">
-        <div className="ui-datepicker-material-day">{todayDayName}</div>
-        <div className="ui-datepicker-material-date">
-          <div className="ui-datepicker-material-day-num">{today}</div>
-          <div className="ui-datepicker-material-month">{todayMonthNameSubj[1]}</div>
-          <div className="ui-datepicker-material-year">{todayYear}</div>
-        </div>
-      </div>
-      <div className="ui-datepicker-header">
-        <div className="ui-datepicker-title">
-          <span className="ui-datepicker-month">{todayMonthName}</span>&nbsp;<span className="ui-datepicker-year">2017</span>
-        </div>
-      </div>
+      <CalendarHeader date={date} />
       <table className="ui-datepicker-calendar">
-        <colgroup>
-          <col/>
-          <col/>
-          <col/>
-          <col/>
-          <col/>
-          <col className="ui-datepicker-week-end"/>
-          <col className="ui-datepicker-week-end"/>
-        </colgroup>
-        <thead>
-        <tr>
-          <th scope="col" title="Понедельник">Пн</th>
-          <th scope="col" title="Вторник">Вт</th>
-          <th scope="col" title="Среда">Ср</th>
-          <th scope="col" title="Четверг">Чт</th>
-          <th scope="col" title="Пятница">Пт</th>
-          <th scope="col" title="Суббота">Сб</th>
-          <th scope="col" title="Воскресенье">Вс</th>
-        </tr>
-        </thead>
+        <CalendarWeeks />
         <tbody>
-        <tr>
-          <td className="ui-datepicker-other-month">27</td>
-          <td className="ui-datepicker-other-month">28</td>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-          <td>4</td>
-          <td>5</td>
-        </tr>
-        <tr>
-          <td>6</td>
-          <td>7</td>
-          <td className="ui-datepicker-today">8</td>
-          <td>9</td>
-          <td>10</td>
-          <td>11</td>
-          <td>12</td>
-        </tr>
+        {calendar.map(week => (<tr key={week}>
+          {
+            week.map(day => <td className={styleDay(day)}  key={day.format('D')}>{day.format('D').toString()}</td>)
+          }
+        </tr>))
+        }
         </tbody>
       </table>
     </div>
   )
+}
+
+Calendar.propTypes = {
+  date: PropTypes.instanceOf(Date).isRequired
 }
 
 export default Calendar;
